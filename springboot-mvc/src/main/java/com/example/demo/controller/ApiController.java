@@ -4,16 +4,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.model.bean.Book;
 import com.example.demo.response.ApiResponse;
 
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 // 了解各種不同 URL 與參數的傳遞接收
@@ -118,5 +121,81 @@ public class ApiController {
 		
 		return ResponseEntity.ok(ApiResponse.success("查詢成功", data));
 		
+	}
+	
+	/**
+	 * 7. 多筆參數轉 Map
+	 * name 書名(String), price 價格(Double), amount 數量(Integer), pub 出刊/停刊(Boolean)
+	 * 路徑: /book?name=Math&price=12.5&amount=10&pub=true
+	 * 路徑: /book?name=English&price=10.5&amount=20&pub=false
+	 * 網址: http://localhost:8080/api/book?name=Math&price=12.5&amount=10&pub=true
+	 * 網址: http://localhost:8080/api/book?name=English&price=10.5&amount=20&pub=false
+	 * 自動會轉為 Map 集合
+	 * */
+	// @GetMapping("/book")
+	public ResponseEntity<ApiResponse<Object>> getBookInfo(@RequestParam Map<String, Object> bookMap) {
+		return ResponseEntity.ok(ApiResponse.success("查詢成功", bookMap));
+	}
+	
+	/**
+	 * 8. 多筆參數轉指定 Bean 物件
+	 */
+	@GetMapping("/book")
+	public ResponseEntity<ApiResponse<Book>> getBookInfo(Book book) {
+		return ResponseEntity.ok(ApiResponse.success("查詢成功", book));
+	}
+	
+	/**
+	 * 9. 路徑參數
+	 * 路徑: /book/1
+	 * 路徑: /book/3
+	 * 網址: http://localhost:8080/api/book/1
+	 * 網址: http://localhost:8080/api/book/3
+	 */
+	@GetMapping("/book/{id}")
+	public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable Integer id) {
+		List<Book> books = List.of(
+				new Book(1, "Math1", 12.5, 20, true),
+				new Book(2, "Maisy", 13.5, 21, false),
+				new Book(3, "The Wild", 14.5, 22, true),
+				new Book(4, "Rain", 15.5, 23, false),
+				new Book(5, "Gustavo", 16.5, 24, true));
+		
+		Optional<Book> optBook = books.stream().filter(b -> b.getId().equals(id)).findAny();
+		
+		if(optBook.isEmpty()) {
+			throw new RuntimeException("查無此書");
+		}
+		
+		return ResponseEntity.ok(ApiResponse.success("查詢成功", optBook.get()));
+	}
+	
+	/**
+	 * Lab: 請列出書本價格介於 13~17 之間且目前仍在版的書名
+	 * 如何設計 GET API ?
+	 * http://localhost:8080/api/book/pub/true?min=13&max=17
+	 * http://localhost:8080/api/book/pub/false?min=13&max=17
+	 * */
+	@GetMapping("/book/pub/{pub}")
+	public ResponseEntity<ApiResponse<List<String>>> queryBook(@PathVariable Boolean pub,
+			@RequestParam Double min, @RequestParam Double max) {
+		
+		List<Book> books = List.of(
+				new Book(1, "Math1", 12.5, 20, true),
+				new Book(2, "Math2", 13.5, 21, false),
+				new Book(3, "Math3", 14.5, 22, true),
+				new Book(4, "Math4", 15.5, 23, false),
+				new Book(5, "Math5", 16.5, 24, true));
+		
+		List<String> bookNames = books.stream().filter(b -> b.getPub())
+											   .filter(b -> b.getPrice() >= min && b.getPrice() <= max)
+											   .map(b -> b.getName())
+											   .collect(Collectors.toList());
+		
+		if(bookNames.size() == 0) {
+			throw new RuntimeException("此範圍查無任何書籍");
+		}
+		
+		return ResponseEntity.ok(ApiResponse.success("查詢成功", bookNames));
 	}
 }
