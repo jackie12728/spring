@@ -18,9 +18,9 @@
 		<form class="pure-form" method="post" action="/javaweb/product/add">
 			<fieldset>
 				<legend>Product 新增</legend>
-				productname: <input type="text" name="productName" placeholder="請輸入 productname" required /><p />
-				price: <input type="text" name="price" placeholder="請輸入 price" required /><p />
-				stock_quantity: <input type="number" name="stockQuantity" min="0" placeholder="請輸入 stock_quantity" required /><p />
+				產品名稱: <input type="text" name="productName" placeholder="請輸入 productname" required /><p />
+				產品價格: <input type="text" name="price" placeholder="請輸入 price" required /><p />
+				庫存數量: <input type="number" name="stockQuantity" min="0" placeholder="請輸入 stock_quantity" required /><p />
 				<button type="reset" class="button-warning pure-button">Reset</button>
 				<button type="submit" class="button-success pure-button">Submit</button>
 			</fieldset>

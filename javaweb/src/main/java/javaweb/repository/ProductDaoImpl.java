@@ -39,7 +39,7 @@ public class ProductDaoImpl extends BaseDao implements ProductDao {
 
 	@Override
 	public Product getProduct(String productname) {
-		String sql = "select product_id, product_name, price, stock_quantity from product where productname=?";
+		String sql = "select product_id, product_name, price, stock_quantity from product where product_name=?";
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, productname);
 

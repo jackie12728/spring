@@ -45,7 +45,8 @@ import javaweb.service.ProductService;
  * 查詢全部: GET /product, /products
  * 
  */
-@WebServlet(urlPatterns = { "/product/*", "/products", "/product/sales/ranking" })
+// @WebServlet(urlPatterns = { "/product/*", "/products", "/product/sales/ranking" })
+@WebServlet(urlPatterns = { "/product/*" })
 public class ProductServlet extends HttpServlet {
 	private ProductService productService = new ProductService();
 
@@ -54,56 +55,37 @@ public class ProductServlet extends HttpServlet {
 		String pathInfo = req.getPathInfo();
 		// resp.getWriter().print(pathInfo); // 用於檢察 pathInfo
 
-//		if (pathInfo.equals("/delete")) {
-//			// 刪除
-//			String productId = req.getParameter("productId");
-//			productService.deleteProduct(productId);
-//
-//			// 刪除完畢之後, 重新執行指定頁面
-//			resp.sendRedirect("/javaweb/product");
-//			return;
-//		} else if (pathInfo.equals("/get")) {
-//			// 取得 product 資料並導入到修改頁面
-//			String productname = req.getParameter("productname");
-//			ProductDto productDto = productService.getProduct(productname);
-//
-//			// 將必要資料加入到 request 屬性中以便交由 jsp 進行分析與呈現
-//			req.setAttribute("productDto", productDto);
-//
-//			// 內重導到 product.jsp / 刷新頁面
-//			req.getRequestDispatcher("/WEB-INF/view/product.jsp").forward(req, resp);
-//			return;
-//		}
-
-//		switch (pathInfo) {
-//		case "/delete":
-//			// 刪除
-//			String productId = req.getParameter("productId");
-//			productService.deleteProduct(productId);
-//
-//			// 刪除完畢之後, 重新執行指定頁面
-//			resp.sendRedirect("/javaweb/product");
-//			break;
-//		case "/get":
-//			// 取得 product 資料並導入到修改頁面
-//			String productname = req.getParameter("productname");
-//			ProductDto productDto = productService.getProduct(productname);
-//
-//			// 將必要資料加入到 request 屬性中以便交由 jsp 進行分析與呈現
-//			req.setAttribute("productDto", productDto);
-//
-//			// 內重導到 product.jsp / 刷新頁面
-//			req.getRequestDispatcher("/WEB-INF/view/product.jsp").forward(req, resp);
-//			break;
-//		}
-
-		String servletPath = req.getServletPath();
-		switch (servletPath) {
-		case "/product/sales/ranking":
+		if (pathInfo == null) {
+	        // pathInfo 為 null 時，執行特定邏輯或轉到默認頁面
+	        req.setAttribute("productDtos", productService.findAllProducts());
+	        req.getRequestDispatcher("/WEB-INF/view/product.jsp").forward(req, resp);
+	        return;
+	    }
+		
+		switch (pathInfo) {
+		case "/sales/ranking":
 			req.setAttribute("salesRankingMap", productService.querySalesRanking());
 			req.getRequestDispatcher("/WEB-INF/view/sales_ranking.jsp").forward(req, resp);
 			break;
-		case "/products":
+		case "/delete":
+			// 刪除
+			String productId = req.getParameter("productId");
+			productService.deleteProduct(productId);
+
+			// 刪除完畢之後, 重新執行指定頁面
+			resp.sendRedirect("/javaweb/product");
+			break;
+		case "/get":
+			// 取得 product 資料並導入到修改頁面
+			String productname = req.getParameter("productname");
+			ProductDto productDto = productService.getProduct(productname);
+			
+			// 將必要資料加入到 request 屬性中以便交由 jsp 進行分析與呈現
+			req.setAttribute("productDto", productDto);
+
+			// 內重導到 product_update.jsp
+			req.getRequestDispatcher("/WEB-INF/view/product_update.jsp").forward(req, resp);
+			break;
 		default:
 			req.setAttribute("productDtos", productService.findAllProducts());
 			req.getRequestDispatcher("/WEB-INF/view/product.jsp").forward(req, resp);

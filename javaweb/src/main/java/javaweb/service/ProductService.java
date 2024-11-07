@@ -32,14 +32,14 @@ public class ProductService {
 		
 		// 或是這樣做
 //		products.stream().forEach((p) -> {
-//			productDtos.add(new ProductDto(p.getProductId(), p.getProductName(), p.getPrice(), p.getStockQuantity()));
+//			productDtos.add(new ProductDto(p.getProductId(), p.getproductName(), p.getPrice(), p.getStockQuantity()));
 //		});
 		return productDtos;
 	}
 	
 	// 取得指定產品
-	public ProductDto getProduct(String productname) {
-		Product product = productDao.getProduct(productname);
+	public ProductDto getProduct(String productName) {
+		Product product = productDao.getProduct(productName);
 		if(product == null) {
 			return null;
 		}
@@ -65,9 +65,9 @@ public class ProductService {
 	}
 	
 	// 修改產品
-	public void updateProduct(String productId, String productname, String price) {
-		if(!productname.isEmpty()) {
-			productDao.updateProductName(Integer.parseInt(productId), productname);
+	public void updateProduct(String productId, String productName, String price) {
+		if(!productName.isEmpty()) {
+			productDao.updateProductName(Integer.parseInt(productId), productName);
 		}
 		if(!price.isEmpty()) {
 			productDao.updatePrice(Integer.parseInt(productId), Double.parseDouble(price));
