@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.bean.Book;
@@ -13,7 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController // 免去撰寫 @ResponseBody，但若有要回應 jsp 則不可用
 @RequestMapping("/api") // 統一 URL 前綴，可以不設置
 public class ApiController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
 	/**
 	 * 1.歡迎頁 
@@ -32,7 +34,9 @@ public class ApiController {
 	 * 網址：http://localhost:8080/api/home
 	 */
 	@GetMapping(value = { "/welcome", "/home" })
-	public String hello() {
+	public String welcome() {
+		// 確認是否有執行到此方法
+		logger.info("這是一條日誌訊息");
 		return "Welcome";
 	}
 
@@ -40,16 +44,18 @@ public class ApiController {
 	 * 2. ?帶參數 
 	 * 路徑：/greet?name=John&age=18 
 	 * 路徑：/greet?name=Mary
-	 * 網址：http://localhost:8080/api/greet?name=John&age=18 
+	 * 網址：http://localhost:8080/api/greet?name=John&age=18
 	 * 結果：John, 18 (成年)
 	 * 網址：http://localhost:8080/api/greet?name=Mary 
 	 * 結果：Mary, 0 (未成年) 限制：name
 	 * 參數一定要加，age 參數可不加(預設初始值為0)
 	 */
 	@GetMapping("/greet")
-	public String greet(@RequestParam(value = "name", required = true) String name,
-			@RequestParam(value = "age", required = false, defaultValue = "0") Integer age) {
-		return String.format("Hi %s, %d (%s)", name, age, age >= 18 ? "成年" : "未成年");
+	public String greet(@RequestParam(value = "name", required = true) String username,
+						@RequestParam(value = "age", required = false, defaultValue = "0") Integer userage) {
+		// 觀察參數
+		logger.info("username = " + username + ", userage = " + userage);
+		return String.format("Hi %s, %d (%s)", username, userage, userage >= 18?"成年":"未成年");
 	}
 
 	// 3. 上述 2 的精簡寫法
